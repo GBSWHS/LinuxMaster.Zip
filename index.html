@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux 명령어 및 개념 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        details {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-6">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold mb-6 text-center">Linux 명령어 및 개념 정리</h1>
+
+        <!-- 소유권과 관련 명령어 -->
+        <details>
+            <summary>소유권과 관련 명령어</summary>
+            <h2 class="text-xl font-semibold mt-4">ls -l</h2>
+            <p>파일 속성을 표시</p>
+            <pre>ls -l
+-rw-rw-r-- 1 wlstmd wlstmd 53 2024-05-19 18:40 TEST</pre>
+            <p><strong>속성 값 의미:</strong></p>
+            <ul class="list-disc ml-6">
+                <li><code>rw-rw-r--</code>: 파일 허가권 및 파일 유형과 접근 권한</li>
+                <li><code>1</code>: 물리적 파일의 개수</li>
+                <li><code>wlstmd</code>: 파일 소유자명</li>
+                <li><code>wlstmd</code>: 파일 소유 그룹명</li>
+                <li><code>53</code>: 파일 크기 (바이트 단위)</li>
+                <li><code>2024-05-19</code>: 파일이 마지막으로 변경된 시간</li>
+                <li><code>TEST</code>: 파일명</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">chown</h2>
+            <p>파일과 디렉터리의 사용자 소유권과 그룹 소유권을 변경</p>
+            <pre># chown [option] 소유자[:그룹명] 파일명
+-R: 하위 디렉터리를 포함하여 모든 파일의 소유권 변경
+
+# 디렉터리 wlstmd의 모든 파일과 하위 디렉터리의 소유권을 root로 변경
+chown -R root wlstmd
+
+# 파일 TEST의 그룹 소유권을 root로 변경
+chown :root TEST</pre>
+
+            <h2 class="text-xl font-semibold mt-4">chgrp</h2>
+            <p>파일이나 디렉터리의 그룹 소유권을 변경</p>
+            <pre># chgrp [option] 그룹명 파일명
+
+# 파일 TEST의 그룹 소유권을 wlstmd로 변경
+chgrp wlstmd TEST</pre>
+        </details>
+
+        <!-- 허가권과 관련 명령어 -->
+        <details>
+            <summary>허가권과 관련 명령어</summary>
+            <h2 class="text-xl font-semibold mt-4">파일 유형 및 허가권</h2>
+            <p><code>ls -l</code>로 파일 유형과 허가권 확인</p>
+            <pre>ls -l
+-rw-rw-r-- 1 wlstmd wlstmd 53 2024-05-19 18:40 TEST</pre>
+            <p><strong>파일 유형:</strong></p>
+            <ul class="list-disc ml-6">
+                <li><code>-</code>: 일반 파일</li>
+                <li><code>d</code>: 디렉터리 파일</li>
+                <li><code>b</code>: 블록 장치 특수 파일</li>
+                <li><code>c</code>: 문자 장치 특수 파일</li>
+                <li><code>l</code>: 기호적 링크</li>
+                <li><code>p</code>: 파이프</li>
+                <li><code>s</code>: 소켓</li>
+            </ul>
+            <p><strong>파일 사용자:</strong> 소유자, 그룹 소유자, 기타 사용자</p>
+            <p><strong>파일 권한:</strong> 읽기(r), 쓰기(w), 실행(x)</p>
+            <p><strong>기호 모드:</strong> r=4, w=2, x=1</p>
+            <p>예: <code>rw-rw-r--</code> → 소유자: 읽기/쓰기, 그룹: 읽기/쓰기, 기타: 읽기</p>
+
+            <h2 class="text-xl font-semibold mt-4">chmod</h2>
+            <p>파일이나 디렉터리의 접근 허가권을 변경</p>
+            <p><strong>숫자 모드:</strong></p>
+            <ul class="list-disc ml-6">
+                <li><code>rwx</code>: 7 (4+2+1)</li>
+                <li><code>rw-</code>: 6 (4+2)</li>
+                <li><code>r-x</code>: 5 (4+1)</li>
+                <li><code>r--</code>: 4</li>
+                <li><code>-wx</code>: 3 (2+1)</li>
+                <li><code>-w-</code>: 2</li>
+                <li><code>--x</code>: 1</li>
+                <li><code>---</code>: 0</li>
+            </ul>
+            <p><strong>기호 모드:</strong></p>
+            <pre># chmod -R o+w wlstmd
+u: 사용자, g: 그룹, o: 기타, a: 모두
++: 부여, -: 제거, =: 지정
+
+# 소유자에게 쓰기 권한 부여
+chmod u+w 파일명
+# 소유자에게 실행 권한 제거
+chmod u-x 파일명
+# 기타 사용자에게 읽기/실행 권한 부여
+chmod o=rx 파일명</pre>
+
+            <h2 class="text-xl font-semibold mt-4">umask</h2>
+            <p>새로 생성되는 파일/디렉터리의 기본 허가권 지정</p>
+            <pre># umask [option][value]
+-S: umask 값을 문자로 표기
+
+# 기본 권한: 파일=666, 디렉터리=777
+# umask 022 → 파일: 666-022=644, 디렉터리: 777-022=755</pre>
+            <p><strong>umask 계산:</strong> 기본 권한 & (~umask)</p>
+            <pre># umask 754
+보수: 000 010 011
+파일 권한: 110 110 110 & 000 010 011 = 000 010 010 (--- -w- -w-)</pre>
+        </details>
+
+        <!-- 특수 권한 -->
+        <details>
+            <summary>특수 권한</summary>
+            <h2 class="text-xl font-semibold mt-4">SetUID와 SetGID</h2>
+            <p>프로세스 실행 중 root 권한을 임시로 부여</p>
+            <ul class="list-disc ml-6">
+                <li><code>SetUID</code>: 소유자 권한으로 실행 (s, 4000)</li>
+                <li><code>SetGID</code>: 그룹 권한으로 실행 (s, 2000)</li>
+                <li><code>Sticky bit</code>: 메모리 점유 유지 (t, 1000)</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">Sticky bit</h2>
+            <p>공용 디렉터리에서 파일 소유자/root만 변경 가능</p>
+            <pre># chmod 1777 ClassA
+ls -l
+drwxrwxrwt. root root 6 5월 13:41 ClassA</pre>
+        </details>
+
+        <!-- 디스크 쿼터 -->
+        <details>
+            <summary>디스크 쿼터</summary>
+            <p>사용자/그룹의 파일 용량 및 개수 제한</p>
+            <p><strong>진행 순서:</strong> /etc/fstab 수정 → 재마운팅 → 쿼터 DB 생성 → 개인별 쿼터 설정</p>
+            <h2 class="text-xl font-semibold mt-4">관련 명령어</h2>
+            <p><strong>quotaoff</strong>: 쿼터 비활성화</p>
+            <p><strong>quotacheck</strong>: 디스크 사용 상태 검색</p>
+            <p><strong>edquota</strong>: 사용자/그룹 쿼터 설정</p>
+            <p><strong>setquota</strong>: 명령행에서 쿼터 설정</p>
+            <p><strong>repquota</strong>: 쿼터 정보 출력</p>
+        </details>
+
+        <!-- LVM -->
+        <details>
+            <summary>LVM</summary>
+            <ul class="list-disc ml-6">
+                <li><strong>PV (Physical Volume)</strong>: LVM에서 사용하는 디스크/파티션</li>
+                <li><strong>VG (Volume Group)</strong>: PV를 묶은 논리적 컨테이너</li>
+                <li><strong>LV (Logical Volume)</strong>: 데이터 저장 공간</li>
+                <li><strong>PE (Physical Extent)</strong>: PV의 데이터 블록 (기본 4MB)</li>
+                <li><strong>LE (Logical Extent)</strong>: LV의 데이터 블록 (PE와 1:1 대응)</li>
+            </ul>
+        </details>
+
+        <!-- tar -->
+        <details>
+            <summary>tar 관련</summary>
+            <p><strong>압축 옵션:</strong></p>
+            <ul class="list-disc ml-6">
+                <li><code>J</code>: xz</li>
+                <li><code>j</code>: bz2</li>
+                <li><code>z</code>: gz</li>
+            </ul>
+            <p><strong>옵션:</strong></p>
+            <ul class="list-disc ml-6">
+                <li><code>-c</code>: 아카이브 생성</li>
+                <li><code>-r</code>: 파일 추가</li>
+                <li><code>-x</code>: 파일 추출</li>
+                <li><code>-t</code>: 내용 확인</li>
+                <li><code>-v</code>: 자세한 출력</li>
+                <li><code>-f</code>: 대상 아카이브 지정</li>
+            </ul>
+        </details>
+
+        <!-- kill 시그널 -->
+        <details>
+            <summary>kill 시그널</summary>
+            <ul class="list-disc ml-6">
+                <li><code>1 SIGHUP</code>: 재시작</li>
+                <li><code>2 SIGINT</code>: [Ctrl+C], 프로세스 종료</li>
+                <li><code>3 SIGQUIT</code>: [Ctrl+\], 종료</li>
+                <li><code>9 SIGKILL</code>: 강제 종료</li>
+                <li><code>15 SIGTERM</code>: 정상 종료 (기본)</li>
+                <li><code>20 SIGTSTP</code>: [Ctrl+Z], 프로세스 중단</li>
+            </ul>
+        </details>
+
+        <!-- 기타 정보 -->
+        <details>
+            <summary>기타 정보</summary>
+            <h2 class="text-xl font-semibold mt-4">프린팅 및 스캐너</h2>
+            <ul class="list-disc ml-6">
+                <li><strong>CUPS</strong>: 애플의 오픈 프린팅 시스템, /etc/cups, IPP(631 포트)</li>
+                <li><strong>LPRng</strong>: BSD 프린팅 시스템</li>
+                <li><strong>SANE</strong>: 스캐너 API</li>
+                <li><strong>ALSA</strong>: 사운드 카드 드라이버</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">vi 옵션</h2>
+            <ul class="list-disc ml-6">
+                <li><code>set ai</code>: 자동 들여쓰기</li>
+                <li><code>set ic</code>: 대소문자 구분 없는 검색</li>
+                <li><code>set sm</code>: 괄호 매칭 표시</li>
+                <li><code>set list</code>: 특수문자 표시</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">패키지 관리</h2>
+            <ul class="list-disc ml-6">
+                <li><code>make</code>: 소프트웨어 컴파일</li>
+                <li><code>cmake</code>: make 파일 생성</li>
+                <li><code>configure</code>: 환경 설정</li>
+                <li><code>dnf</code>: RPM 의존성 해결</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">셸</h2>
+            <ul class="list-disc ml-6">
+                <li><code>ksh</code>: Bourne Shell 호환</li>
+                <li><code>bash</code>: 리눅스 표준 셸</li>
+                <li><code>dash</code>: POSIX 준수</li>
+                <li><code>tcsh</code>: C Shell 확장</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">/etc/fstab</h2>
+            <p>필드: 장치명, 마운트 포인트, 파일 시스템, 마운트 옵션, Dump 값, 무결성 검사 우선순위</p>
+            <p><strong>마운트 옵션:</strong></p>
+            <ul class="list-disc ml-6">
+                <li><code>default</code>: rw, nouser, auto, exec, suid</li>
+                <li><code>auto/noauto</code>: 부팅 시 마운트 여부</li>
+                <li><code>exec/noexec</code>: 실행 파일 허용</li>
+                <li><code>suid/nosuid</code>: Set-UID/GID 허용</li>
+                <li><code>ro/rw</code>: 읽기 전용/읽기 쓰기</li>
+                <li><code>user/nouser</code>: 일반 사용자 마운트 허용</li>
+                <li><code>quota/noquota</code>: 쿼터 설정</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">포트</h2>
+            <ul class="list-disc ml-6">
+                <li>ftp-data: 20</li>
+                <li>ftp: 21</li>
+                <li>ssh: 22</li>
+                <li>telnet: 23</li>
+                <li>smtp: 25</li>
+                <li>dns: 53</li>
+                <li>http: 80</li>
+                <li>POP3: 110</li>
+                <li>IMAP: 143</li>
+                <li>HTTPS: 443</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">네트워크 설정 파일</h2>
+            <ul class="list-disc ml-6">
+                <li><code>/etc/resolv.conf</code>: 네임서버 지정</li>
+                <li><code>/etc/services</code>: 포트 정의</li>
+                <li><code>/etc/sysconfig/network-scripts</code>: IP 주소 설정</li>
+                <li><code>/etc/hosts</code>: IP-도메인 매핑</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">LAN 케이블 속도</h2>
+            <ul class="list-disc ml-6">
+                <li>CAT.5: 100Mbps</li>
+                <li>CAT.5e: 1Gbps</li>
+                <li>CAT.6: 1Gbps</li>
+                <li>CAT.6A: 10Gbps</li>
+                <li>CAT.7: 10Gbps</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">fdisk</h2>
+            <p>디스크 파티션 관리</p>
+            <p><strong>내부 명령:</strong></p>
+            <ul class="list-disc ml-6">
+                <li><code>a</code>: 부트 플래그 전환</li>
+                <li><code>d</code>: 파티션 삭제</li>
+                <li><code>n</code>: 새 파티션 추가</li>
+                <li><code>p</code>: 파티션 테이블 출력</li>
+                <li><code>w</code>: 변경 저장</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">/etc/passwd</h2>
+            <p>필드: 사용자명, 패스워드, UID, GID, 이름, 홈 디렉토리, 로그인 셸</p>
+
+            <h2 class="text-xl font-semibold mt-4">RAID</h2>
+            <ul class="list-disc ml-6">
+                <li><code>RAID0</code>: 스트라이핑, 백업 없음</li>
+                <li><code>RAID1</code>: 미러링, 백업용 복제</li>
+                <li><code>RAID5</code>: 패리티 1개, 최소 3개 디스크</li>
+                <li><code>RAID6</code>: 패리티 2개, 최소 4개 디스크</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-4">IPv4 사설 IP</h2>
+            <ul class="list-disc ml-6">
+                <li>A: 10.0.0.0 ~ 10.255.255.255</li>
+                <li>B: 172.16.0.0 ~ 172.31.255.255</li>
+                <li>C: 192.168.0.0 ~ 192.168.255.255</li>
+            </ul>
+        </details>
+    </div>
+</body>
+</html>
